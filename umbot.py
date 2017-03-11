@@ -6,7 +6,7 @@ from slackclient import SlackClient
 
 BOT_NAME = 'umbot'
 
-SQLITE_DATABASE = r'C:\Users\gigatropolis\Documents\GitHub\build\src\Data\database2.sqlite'
+SQLITE_DATABASE = r'./brewdata.sqlite'
 
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
 
@@ -73,6 +73,38 @@ Current supported commands are 'help', 'list', and 'explain'.
         \"umbot list hops\"
         \"umbot explain hop Cascade\""""
 
+def  handle_list(command, channel):
+    """
+        Connects to data source to list beer related ingredient or recipe 
+    """
+    response = "Try: \"list hops\""
+    words = command.split(" ")
+    print("words: %s" %(words))
+
+    if words[1] == "help":
+        return """ Use 'list to get names of beer ingredients
+
+  Current supported ingredients are 'hops', 'grains', and 'yeast'
+
+  Type a command like \"umbot list hops\" or "umbot list yeast\"
+  """
+    if words[1] == "hops":
+        response =  ListHops()
+
+    if words[1] == "ferm" or words[1] == "grains" or words[1] == "fermentables":
+        response =  ListFerms()
+
+    if words[1] == "yeast":
+        response =  ListYeast()
+
+    if words[1] == "styles":
+        response =  ListStyles()
+
+    if words[1] == "recipes":
+        response =  ListRecipes()
+
+    return response
+
 def  handle_explain(command, channel):
     """
         Connects to data source to explain beer related ingredient or recipe 
@@ -92,7 +124,7 @@ def  handle_explain(command, channel):
         return GetHopExplanation(command.split("hop")[1].strip())
 
     if words[1] == "grain" or words[1] == "ferm" or words[1] == "fermentable":
-       return GetGrainExplanation(command.split(word[1])[1].strip())
+       return GetGrainExplanation(command.split(words[1])[1].strip())
 
     if words[1] == "yeast":
        return GetYeastExplanation(command.split("yeast")[1].strip())
@@ -156,6 +188,35 @@ def ListYeast():
 def ListStyles():
     return _listIngredient("style")
 
+def ListRecipes():
+    response = "Unable to get Recipe list from database"
+
+    query = "SELECT DISTINCT recipe.id, recipe.name, style.name, recipe.og, recipe.fg FROM recipe, style WHERE recipe.style_id = style.id"
+    try:
+        con = lite.connect(SQLITE_DATABASE)
+        cur = con.cursor()
+        cur.execute(query)
+
+        recipes = cur.fetchall()
+        #print("data: ", data)
+
+    except:
+        recipes = None
+    finally:
+        if con:
+            con.close()
+
+    if not recipes:
+        return response
+
+    response = ""
+
+    for recipe in recipes:
+        response += "(%d) %s (%s) OG: %0.3f FG: %0.3f\n" % (recipe[0], recipe[1], recipe[2], recipe[3], recipe[4])
+    
+    return response
+    #SELECT hop.name, hop.amount hop.alpha FROM hop, hop_in_recipe WHERE hop_in_recipe.recipe_id=14 AND hop.id = hop_in_recipe.hop_id;
+
 def GetHopExplanation(name):
     
     query = "SELECT name, alpha, beta, notes, origin FROM hop where name like '%%%s%%'" % (name)
@@ -174,7 +235,7 @@ def GetGrainExplanation(name):
     data = _getIngredient(query)
 
     if data:
-        response = "Found: _*%s*_\nyield=%d\color=%d\nOrigin=%s\nSupplier=%s\nExplanation: %s\n" % (data[0], data[1], data[2], data[5], data[3], data[4])
+        response = "Found: _*%s*_\nyield=%d\ncolor=%d\nOrigin=%s\nSupplier=%s\nExplanation: %s\n" % (data[0], data[1], data[2], data[5], data[3], data[4])
     else:
         response = "No information found for fermentable '%s' try 'list ferm' for list of available fermentables" % (name)
 
@@ -203,7 +264,7 @@ def GetStyleExplanation(name):
     
     *type:* %s    *cat:* %s (%s%s)
         
-    *OG:* %0.4f - %0.4f     *FG:* %0.4f - %0.4f
+    *OG:* %0.3f - %0.3f     *FG:* %0.3f - %0.3f
     
     *IBU:* %d - %d    *Color (SRM):* %d - %d
     
@@ -230,35 +291,6 @@ def GetStyleExplanation(name):
 
     return response
     
-def  handle_list(command, channel):
-    """
-        Connects to data source to list beer related ingredient or recipe 
-    """
-    response = "Try: \"list hops\""
-    words = command.split(" ")
-    print("words: %s" %(words))
-
-    if words[1] == "help":
-        return """ Use 'list to get names of beer ingredients
-
-  Current supported ingredients are 'hops', 'grains', and 'yeast'
-
-  Type a command like \"umbot list hops\" or "umbot list yeast\"
-  """
-    if words[1] == "hops":
-        response =  ListHops()
-
-    if words[1] == "ferm" or words[1] == "grains" or words[1] == "fermentables":
-        response =  ListFerms()
-
-    if words[1] == "yeast":
-        response =  ListYeast()
-
-    if words[1] == "styles":
-        response =  ListStyles()
-
-    return response
-
 if __name__ == "__main__":
     READ_WEBSOCKET_DELAY = 1 # 1 second delay between reading from firehose
     if slack_client.rtm_connect():
