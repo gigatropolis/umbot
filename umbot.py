@@ -1,13 +1,10 @@
 import os
 import time
-#import sqlite3 as lite
 from slackclient import SlackClient
 import brewdata
 
 
 BOT_NAME = 'umbot'
-
-SQLITE_DATABASE = r'./brewdata.sqlite'
 
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
 
@@ -21,6 +18,20 @@ AT_BOT = "<@" + BOT_ID + ">"
 # instantiate Slack & Twilio clients
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
 
+def GetHelp():
+    return """
+Current supported commands are 'help', 'list', and 'explain'.
+    
+    *help*
+    *list*      hops|(ferm|fermentables|grains)|yeast|styles
+    *explain*   hop|(ferm|fermentables|grains)|yeast|style  <name of ingredient or style to explain>
+
+      *Example:*
+        \"umbot help\"
+        \"umbot list hops\"
+        \"umbot explain hop Cascade\""""
+
+
 def handle_command(command, channel):
     """
         Receives commands directed at the bot and determines if they
@@ -30,7 +41,7 @@ def handle_command(command, channel):
     response = "ask umbot for help"
     words = command.split(" ")
     if command.startswith("help".lower()):
-        response = brewdata.GetHelp()
+        response = GetHelp()
 
     elif command.startswith("explain".lower()):
         response = brewdata.handle_explain(command, channel)

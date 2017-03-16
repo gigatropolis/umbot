@@ -1,20 +1,9 @@
 import os
 import time
 import sqlite3 as lite
-from slackclient import SlackClient
 
-def GetHelp():
-    return """
-Current supported commands are 'help', 'list', and 'explain'.
-    
-    *help*
-    *list*      hops|(ferm|fermentables|grains)|yeast|styles
-    *explain*   hop|(ferm|fermentables|grains)|yeast|style  <name of ingredient or style to explain>
-
-      *Example:*
-        \"umbot help\"
-        \"umbot list hops\"
-        \"umbot explain hop Cascade\""""
+SQLITE_DATABASE = r'./brewdata.sqlite'
+#SQLITE_DATABASE = r'./database.sqlite'
 
 def  handle_list(command, channel):
     """
@@ -156,7 +145,7 @@ def ListStyles():
 
 def ListRecipes():
     response = "Unable to get Recipe list from database"
-
+    con = None
     query = "SELECT DISTINCT recipe.id, recipe.name, style.name, recipe.og, recipe.fg FROM recipe, style WHERE recipe.style_id = style.id"
     try:
         con = lite.connect(SQLITE_DATABASE)
@@ -266,7 +255,7 @@ def GetRecipeExplanation(name):
     
     recID = recID[0]
    
-    query = "SELECT hop.name, hop.amount, hop.alpha FROM hop, hop_in_recipe WHERE hop_in_recipe.recipe_id=%d AND hop.id = hop_in_recipe.hop_id" % (recID)
+    query = "SELECT hop.name, hop.amount, hop.time, hop.alpha FROM hop, hop_in_recipe WHERE hop_in_recipe.recipe_id=%d AND hop.id = hop_in_recipe.hop_id" % (recID)
     hops = _GetAllRecords(query)
 
     query = "SELECT fermentable.name, fermentable.amount, fermentable.yield, fermentable.color FROM fermentable, fermentable_in_recipe WHERE fermentable_in_recipe.recipe_id = %d AND fermentable.id =  fermentable_in_recipe.fermentable_id" % (recID)
@@ -279,16 +268,16 @@ def GetRecipeExplanation(name):
         return "No recipe information found for recipe '%s'" % (name)
 
     if hops:
-        strHops = "%25s %10s %10s\n\n" % ("Name", "Amount", "Alpha") 
+        strHops = "%25s %10s %10s %10s\n\n" % ("Name", "Amount", "time", "Alpha") 
         for hop in hops:
-            strHops += "%25s %10.2foz %10.1f%%\n" % (hop[0], hop[1] * 34.274, hop[2])
+            strHops += "%25s %10.2foz %10dmin %10.1f%%\n" % (hop[0], hop[1] * 34.274, hop[2], hop[3])
     else:
         strHops = ""
 
     if ferms:
         strFerms = "%40s %10s %10s %10s\n\n" % ("Name", "Amount", "Yield", "Color")
         for ferm in ferms:
-            strFerms += "%40s %10.2f %10.1f %10.1f\n" % (ferm[0], ferm[1] * 34.274, ferm[2], ferm[3])
+            strFerms += "%40s %10.2flb %10.1f %10.1f\n" % (ferm[0], ferm[1] / 0.453592374, ferm[2], ferm[3])
     else:
         strFerms = ""
             
