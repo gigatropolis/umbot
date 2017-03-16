@@ -23,8 +23,8 @@ def GetHelp():
 Current supported commands are 'help', 'list', and 'explain'.
     
     *help*
-    *list*      hops|(ferm|fermentables|grains)|yeast|styles
-    *explain*   hop|(ferm|fermentables|grains)|yeast|style  <name of ingredient or style to explain>
+    *list*      hops|(ferm|fermentables|grains)|yeast|styles|recipes
+    *explain*   hop|(ferm|fermentables|grains)|yeast|style|recipe  <name of ingredient, style, or recipe to explain>
 
       *Example:*
         \"umbot help\"
