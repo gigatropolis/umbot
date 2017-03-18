@@ -1,6 +1,7 @@
 import os
 import time
 import sqlite3 as lite
+import calcbeer as beer
 
 SQLITE_DATABASE = r'./brewdata.sqlite'
 #SQLITE_DATABASE = r'./database.sqlite'
@@ -255,7 +256,7 @@ def GetRecipeExplanation(name):
     
     recID = recID[0]
    
-    query = "SELECT hop.name, hop.amount, hop.time, hop.alpha FROM hop, hop_in_recipe WHERE hop_in_recipe.recipe_id=%d AND hop.id = hop_in_recipe.hop_id" % (recID)
+    query = "SELECT hop.name, hop.amount, hop.time, hop.alpha, hop.use FROM hop, hop_in_recipe WHERE hop_in_recipe.recipe_id=%d AND hop.id = hop_in_recipe.hop_id" % (recID)
     hops = _GetAllRecords(query)
 
     query = "SELECT fermentable.name, fermentable.amount, fermentable.yield, fermentable.color FROM fermentable, fermentable_in_recipe WHERE fermentable_in_recipe.recipe_id = %d AND fermentable.id =  fermentable_in_recipe.fermentable_id" % (recID)
@@ -266,24 +267,43 @@ def GetRecipeExplanation(name):
 
     if not data:
         return "No recipe information found for recipe '%s'" % (name)
+    
+    name, style, og, fg, batch_size, boil_size, boil_time, efficiency, notes, taste_notes = data
+    batch_size = beer.KilToGal(batch_size)
+    boil_size = beer.KilToGal(boil_size)
+    ibu, SRM, abv = 0, 0.0, beer.ABV(og, fg)
 
     if hops:
         strHops = "%25s %10s %10s %10s\n\n" % ("Name", "Amount", "time", "Alpha") 
         for hop in hops:
-            strHops += "%25s %10.2foz %10dmin %10.1f%%\n" % (hop[0], hop[1] * 34.274, hop[2], hop[3])
+            hopName, hopAmount, hopTime, hopAlpha, hopUse = hop
+            hopAmount = beer.KilToOz(hopAmount)
+            strHops += "%25s %10.2foz %10dmin %10.1f%%\n" % (hopName, hopAmount, hopTime, hopAlpha)
+
+            bTime = hopTime
+            if hopUse == "dry hop".lower():
+                continue
+            if hopUse == "first wort".lower() or hopUse == "wort".lower():
+                bTime = 20
+            ibu += beer.getIBU(batch_size, bTime, hopAmount, hopAlpha, og, boil_size)
+            
     else:
         strHops = ""
 
     if ferms:
         strFerms = "%40s %10s %10s %10s\n\n" % ("Name", "Amount", "Yield", "Color")
+        mcu = 0.0
         for ferm in ferms:
-            strFerms += "%40s %10.2flb %10.1f %10.1f\n" % (ferm[0], ferm[1] / 0.453592374, ferm[2], ferm[3])
+            fermName, fermAmount, fermYield, fermColor = ferm
+            fermAmount = beer.KilToLb(fermAmount)
+
+            mcu += fermAmount * fermColor / batch_size
+
+            strFerms += "%40s %10.2flb %10.1f %10.1f\n" % (fermName, fermAmount, fermYield, fermColor)
+
+        SRM = beer.McuToSrm(mcu)
     else:
         strFerms = ""
-            
-
-    name, style, og, fg, batch_size, boil_size, boil_time, efficiency, notes, taste_notes = data
-    ibu, color, abv = 0, 0.0, 0.0
 
     response = """Found Recipe:  _*%s*_    Style: %s
     
@@ -293,7 +313,7 @@ def GetRecipeExplanation(name):
     
     *Batch Size:*  %0.2f gal     *Boil Size:*  %0.2f gal     *Boil Time:*  %d min     *Mash efficiency:*  %d%%
 
-    Hops:
+    *Hops:*
     
 %s
 
@@ -308,7 +328,7 @@ def GetRecipeExplanation(name):
     *Tasting Notes:*
     
        %s 
-""" % (name, style, og, fg, ibu, color, abv, batch_size * 0.26417, boil_size * 0.26417, boil_time, efficiency,
+""" % (name, style, og, fg, ibu, SRM, abv, batch_size, boil_size, boil_time, efficiency,
         strHops, strFerms, notes, taste_notes)
     
     return response
