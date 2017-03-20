@@ -55,7 +55,8 @@ def ABV(og, fg):
     return (og-fg) * 131.25
    
 def KilToOz(kilAmount):
-    return kilAmount * 34.274
+    #return kilAmount * 34.274
+    return kilAmount /  0.02834952
 
 def KilToGal(kilAmount):
     return kilAmount * 0.26417
