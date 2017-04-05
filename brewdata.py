@@ -31,7 +31,11 @@ def  handle_list(command, channel):
         response =  ListYeast()
 
     if words[1] == "styles":
-        response =  ListStyles()
+        if len(words) <= 2:
+            response =  ListStyles()
+
+        if words[2].lower() == "long":
+            response = ListStylesLong(command)
 
     if words[1] == "recipes":
         response =  ListRecipes()
@@ -210,15 +214,20 @@ def GetYeastExplanation(name):
     return response
 
 def ListStylesLong(command):
-    query = "SELECT name, s_type, category, category_number, style_letter, og_min, og_max, fg_min, fg_max, ibu_min, ibu_max, color_min, color_max, abv_min, abv_max FROM style"
+    query = "SELECT DISTINCT name, s_type, category, category_number, style_letter, og_min, og_max, fg_min, fg_max, ibu_min, ibu_max, color_min, color_max, abv_min, abv_max FROM style"
     styles = _GetAllRecords(query)
-    name, s_type, category, category_number, style_letter, og_min, og_max, fg_min, fg_max, ibu_min, ibu_max, color_min, color_max, abv_min, abv_max = styles
-
+ 
     if not styles:
         return "No styles found listing with long option"
 
+    response = ""
     for style in styles:
-        
+        name, s_type, category, category_number, style_letter, og_min, og_max, fg_min, fg_max, ibu_min, ibu_max, color_min, color_max, abv_min, abv_max = style
+        response += "%s%s %s - %s:  %s:  OG: %0.3f - %0.3f  FG: %0.3f - %0.3f IBU: %d - %d  SRM: %d - %d  %0.1f%% - %0.1f%%\n" % (category_number, style_letter, s_type, category,
+                      name, og_min, og_max, fg_min, fg_max, ibu_min, ibu_max, color_min, color_max, abv_min, abv_max)
+
+    return response
+
 def GetStyleExplanation(name):
     
     query = "SELECT name, s_type, category, category_number, style_letter, og_min, og_max, fg_min, fg_max, ibu_min, ibu_max, color_min, color_max, abv_min, abv_max, notes, profile, ingredients, examples FROM style where name like '%%%s%%'" % (name)
