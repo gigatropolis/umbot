@@ -274,11 +274,14 @@ def GetRecipeExplanation(name):
     ibu, SRM, abv = 0, 0.0, beer.ABV(og, fg)
 
     if hops:
+        #strHops = "| Name                       | Amount | Yield | Color |\n"
+        #strHops += "|----------------------------|--------|-------|-------|---|\n"
         strHops = "%25s %10s %10s %10s\n\n" % ("Name", "Amount", "time", "Alpha") 
         for hop in hops:
             hopName, hopAmount, hopTime, hopAlpha, hopUse = hop
             hopAmount = beer.KilToOz(hopAmount)
             strHops += "%25s %10.2foz %10dmin %10.1f%%\n" % (hopName, hopAmount, hopTime, hopAlpha)
+            #strHops += "| %s | %0.2foz | %dmin | %0.1f%%|\n" % (hopName, hopAmount, hopTime, hopAlpha)
 
             bTime = hopTime
             if hopUse == "dry hop".lower():
