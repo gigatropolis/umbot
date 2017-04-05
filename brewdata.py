@@ -209,10 +209,21 @@ def GetYeastExplanation(name):
 
     return response
 
+def ListStylesLong(command):
+    query = "SELECT name, s_type, category, category_number, style_letter, og_min, og_max, fg_min, fg_max, ibu_min, ibu_max, color_min, color_max, abv_min, abv_max FROM style"
+    styles = _GetAllRecords(query)
+    name, s_type, category, category_number, style_letter, og_min, og_max, fg_min, fg_max, ibu_min, ibu_max, color_min, color_max, abv_min, abv_max = styles
+
+    if not styles:
+        return "No styles found listing with long option"
+
+    for style in styles:
+        
 def GetStyleExplanation(name):
     
     query = "SELECT name, s_type, category, category_number, style_letter, og_min, og_max, fg_min, fg_max, ibu_min, ibu_max, color_min, color_max, abv_min, abv_max, notes, profile, ingredients, examples FROM style where name like '%%%s%%'" % (name)
     data = _getIngredient(query)
+    name, s_type, category, category_number, style_letter, og_min, og_max, fg_min, fg_max, ibu_min, ibu_max, color_min, color_max, abv_min, abv_max, notes, profile, ingredients, examples = data
 
     if data:
         response = """ Found Style:  _*%s*_
@@ -239,8 +250,8 @@ def GetStyleExplanation(name):
        
     *Examples:*
     
-       %s   """ % (data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8],
-        data[9], data[10], data[11], data[12], data[13], data[14], data[15], data[16], data[17], data[18])
+       %s   """ % (name, s_type, category, category_number, style_letter, og_min, og_max, fg_min, fg_max, ibu_min, ibu_max, color_min, color_max,
+                   abv_min, abv_max, notes, profile, ingredients, examples)
     else:
         response = "No style information found for style '%s' try 'list styles' for list of available styles" % (name)
 
