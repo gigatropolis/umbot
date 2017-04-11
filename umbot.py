@@ -23,13 +23,14 @@ def GetHelp():
 Current supported commands are 'help', 'list', and 'explain'.
     
     *help*
-    *list*      hops|(ferm|fermentables|grains)|yeast|styles|recipes
+    *list*      hops|(ferm|fermentables|grains)|yeast|styles|recipes   [long]
     *explain*   hop|(ferm|fermentables|grains)|yeast|style|recipe  <name of ingredient, style, or recipe to explain>
 
       *Example:*
-        \"umbot help\"
-        \"umbot list hops\"
-        \"umbot explain hop Cascade\""""
+        \"@umbot help\"
+        \"@umbot list hops\"
+        \"@umbot list styles long\"
+        \"@umbot explain hop Cascade\""""
 
 
 def handle_command(command, channel):
