@@ -41,13 +41,13 @@ def handle_command(command, channel):
     """
     response = "ask umbot for help"
     words = command.split(" ")
-    if command.startswith("help".lower()):
+    if words[0].lower() == "help" or words[0].lower() == "?" or words[0].lower() == "h":
         response = GetHelp()
 
-    elif command.startswith("explain".lower()):
+    elif words[0].lower() == "explain" or words[0].lower() == "ex":
         response = brewdata.handle_explain(command, channel)
         
-    if command.startswith("list".lower()):
+    if words[0].lower() == "list" or words[0].lower() == "ls":
         response = brewdata.handle_list(command, channel)
     
     slack_client.api_call("chat.postMessage", channel=channel,

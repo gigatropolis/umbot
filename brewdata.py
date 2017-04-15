@@ -50,27 +50,29 @@ def  handle_explain(command, channel):
     words = command.split(" ")
     print("words: %s" %(words))
 
-    if words[1] == "help":
+    it = words[1].lower()
+
+    if it == "help" or it == "?":
         return """ Use 'explain to get more detail about a beer ingredient or style.
 
   Current supported ingredient types or 'hop', 'grain', 'yeast', and 'style'
 
   Type a command like \"umbot explain hop Centennial\" or "umbot explain grain Vienna\"
   """
-    if words[1] == "hop":
-        return GetHopExplanation(command.split("hop")[1].strip())
+    if it == "hop":
+        return GetHopExplanation(command.split(words[1])[1].strip())
 
-    if words[1] == "grain" or words[1] == "ferm" or words[1] == "fermentable":
+    if it == "grain" or it == "ferm" or it == "fermentable":
        return GetGrainExplanation(command.split(words[1])[1].strip())
 
-    if words[1] == "yeast":
-       return GetYeastExplanation(command.split("yeast")[1].strip())
+    if it == "yeast":
+       return GetYeastExplanation(command.split(words[1])[1].strip())
 
-    if words[1] == "style":
-       return GetStyleExplanation(command.split("style")[1].strip())
+    if it == "style":
+       return GetStyleExplanation(command.split(words[1])[1].strip())
 
-    if words[1] == "recipe":
-           return GetRecipeExplanation(command.split("recipe")[1].strip())
+    if it == "recipe":
+           return GetRecipeExplanation(command.split(words[1])[1].strip())
 
 def _getIngredient(query):
      try:
@@ -296,17 +298,22 @@ def GetRecipeExplanation(name):
     if hops:
         #strHops = "| Name                       | Amount | Yield | Color |\n"
         #strHops += "|----------------------------|--------|-------|-------|---|\n"
-        strHops = "%25s %10s %10s %10s\n\n" % ("Name", "Amount", "time", "Alpha") 
+        strHops = "%25s %10s %10s %10s %10s\n\n" % ("Name", "Amount", "time", "Alpha", "Use") 
         for hop in hops:
             hopName, hopAmount, hopTime, hopAlpha, hopUse = hop
             hopAmount = beer.KilToOz(hopAmount)
-            strHops += "%25s %10.2foz %10dmin %10.1f%%\n" % (hopName, hopAmount, hopTime, hopAlpha)
+            if hopUse.lower() == "dry hop":
+                hopTime = hopTime/60/24
+
+            strHops += "%25s %10.2foz %10d%s %10.1f%% %10s\n" % (hopName, hopAmount, hopTime,
+                                                    ("days" if hopUse.lower() == "dry hop" else "min"), 
+                                                    hopAlpha, hopUse)
             #strHops += "| %s | %0.2foz | %dmin | %0.1f%%|\n" % (hopName, hopAmount, hopTime, hopAlpha)
 
             bTime = hopTime
-            if hopUse == "dry hop".lower():
+            if hopUse.lower() == "dry hop":
                 continue
-            if hopUse == "first wort".lower() or hopUse == "wort".lower():
+            if hopUse.lower() == "first wort" or hopUse.lower() == "wort":
                 bTime = 20
             ibu += beer.getIBU(batch_size, bTime, hopAmount, hopAlpha, og, boil_size)
             
