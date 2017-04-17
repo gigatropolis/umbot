@@ -2,7 +2,7 @@ import os
 import time
 from slackclient import SlackClient
 import brewdata
-
+import um_meetup
 
 BOT_NAME = 'umbot'
 
@@ -48,10 +48,29 @@ def handle_command(command, channel):
         response = brewdata.handle_explain(command, channel)
         
     if words[0].lower() == "list" or words[0].lower() == "ls":
-        response = brewdata.handle_list(command, channel)
+        response = handle_list(command, channel)
     
     slack_client.api_call("chat.postMessage", channel=channel,
                           text=response, as_user=True)
+
+def handle_list(command, channel):
+    """
+        Find what is being listed and call appropriate handler 
+    """
+    response = "Unknown list command"
+    words = command.split(" ")
+
+    if words[1] == "help":
+        return """ Use 'list to get names of beer ingredients
+
+  Current supported ingredients are 'hops', 'grains', and 'yeast'
+
+  Type a command like \"umbot list hops\" or "umbot list yeast\"
+  """
+    if words[1].lower() == 'upcomming' or words[1].lower() == 'events':
+        return um_meetup.handle_list(command, channel)
+
+    return brewdata.handle_list(command, channel)
 
 def parse_slack_output(slack_rtm_output):
     """
@@ -64,10 +83,9 @@ def parse_slack_output(slack_rtm_output):
         for output in output_list:
 
             if output and 'text' in output:
-                print("channel=%s  output=%s" % (output['channel'], output['text']))
+                print(output)
 
             if output and 'text' in output and AT_BOT in output['text']:
-                print(output)
                 # return text after the @ mention, whitespace removed
                 return output['text'].split(AT_BOT)[1].strip(), \
                        output['channel']
