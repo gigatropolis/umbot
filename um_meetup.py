@@ -13,13 +13,6 @@ def  handle_list(command, channel):
     words = command.split(" ")
     print("words: %s" %(words))
 
-    if words[1] == "help":
-        return """ Use 'list to get names of beer ingredients
-
-  Current supported ingredients are 'hops', 'grains', and 'yeast'
-
-  Type a command like \"umbot list hops\" or "umbot list yeast\"
-  """
     if words[1].lower() == 'upcoming' or words[1].lower() == 'events':
         events = GetEvents('umunhum', 'upcoming')
         response = ShowEvents(events)

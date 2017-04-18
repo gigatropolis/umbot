@@ -23,14 +23,16 @@ def GetHelp():
 Current supported commands are 'help', 'list', and 'explain'.
     
     *help*
-    *list*      hops|(ferm|fermentables|grains)|yeast|styles|recipes   [long]
+    *list*      events|hops|(ferm|fermentables|grains)|yeast|styles|recipes   [long]
     *explain*   hop|(ferm|fermentables|grains)|yeast|style|recipe  <name of ingredient, style, or recipe to explain>
 
       *Example:*
-        \"@umbot help\"
-        \"@umbot list hops\"
-        \"@umbot list styles long\"
-        \"@umbot explain hop Cascade\""""
+        "@umbot help"
+        "@umbot list events"   This will list the next five upcoming events on meetup
+        "@umbot list hops"
+        "@umbot list styles long"
+        "@umbot explain hop Cascade"
+     """
 
 
 def handle_command(command, channel):
@@ -60,12 +62,14 @@ def handle_list(command, channel):
     response = "Unknown list command"
     words = command.split(" ")
 
-    if words[1] == "help":
-        return """ Use 'list to get names of beer ingredients
+    if (len(words < 1) or words[1] == "help":
+        return """ Use 'list to get names of beer ingredients and meetup events
 
-  Current supported ingredients are 'hops', 'grains', and 'yeast'
+  Current beer ingredients are 'hops', 'grains', and 'yeast'
 
-  Type a command like \"umbot list hops\" or "umbot list yeast\"
+  list events will give the next five upcoming meetups
+
+  Type a command like \"@umbot list hops\"  or "@umbot list yeast\"
   """
     if words[1].lower() == 'upcomming' or words[1].lower() == 'events':
         return um_meetup.handle_list(command, channel)
