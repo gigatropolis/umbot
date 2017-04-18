@@ -1,4 +1,5 @@
 import os
+import datetime
 import meetup.api
 
 # MEETUP Token
@@ -33,13 +34,26 @@ def ShowEvents(events, max = 5):
     count = 1
     print(len(events))
     for event in events:
-        response += """# %d *Name* %s
+        #print(event)
+        date = datetime.date.fromtimestamp(event['time']/1000).strftime("%B %d %Y")
+        response += """*#%d  %s*
 
-        located at %s
+        located at %s   *date:*  %s
 
-        *Description:* %s
+        RSVP: %d  Maybe: %d   Wait list: %d
+ 
+        Address: %s, %s
 
-        """ % (count, event['name'], event['venue']['name'], event['description'])
+       *Description:* %s
+
+       %s
+
+      --------------------------------------------------------------------
+
+        """ % (count, event['name'], event['venue']['name'], date,
+               event['yes_rsvp_count'], event['maybe_rsvp_count'], event['waitlist_count'],
+               event['venue']['address_1'], event['venue']['city'],
+               event['description'], event['event_url'])
 
         count += 1
         if count > max:
