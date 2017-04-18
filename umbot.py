@@ -62,7 +62,7 @@ def handle_list(command, channel):
     response = "Unknown list command"
     words = command.split(" ")
 
-    if (len(words < 1) or words[1] == "help":
+    if (len(words) < 2) or words[1].lower() == "help":
         return """ Use 'list to get names of beer ingredients and meetup events
 
   Current beer ingredients are 'hops', 'grains', and 'yeast'
