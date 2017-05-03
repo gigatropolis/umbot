@@ -41,8 +41,9 @@ def handle_command(command, channel):
         are valid commands. If so, then acts on the commands. If not,
         returns back what it needs for clarification.
     """
-    response = "ask umbot for help"
+    response = ""
     words = command.split(" ")
+    
     if words[0].lower() == "help" or words[0].lower() == "?" or words[0].lower() == "h":
         response = GetHelp()
 
@@ -52,6 +53,9 @@ def handle_command(command, channel):
     if words[0].lower() == "list" or words[0].lower() == "ls":
         response = handle_list(command, channel)
     
+    if not response:
+        response = GetHelp()
+
     slack_client.api_call("chat.postMessage", channel=channel,
                           text=response, as_user=True)
 
