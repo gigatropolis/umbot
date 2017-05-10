@@ -27,7 +27,17 @@ def ShowEvents(events, max = 5):
     count = 1
     print(len(events))
     for event in events:
+        
         #print(event)
+        if 'venue' in event:
+            ven_name = event['venue']['name']
+            ven_add1 = event['venue']['address_1']
+            ven_city = event['venue']['city']
+        else:
+            ven_name = 'Not Determined'
+            ven_add1 = 'Not Determined'
+            ven_city = 'Not Determined'
+
         date = datetime.date.fromtimestamp(event['time']/1000).strftime("%B %d %Y")
         response += """*#%d  %s*
 
@@ -43,9 +53,9 @@ def ShowEvents(events, max = 5):
 
       --------------------------------------------------------------------
 
-        """ % (count, event['name'], event['venue']['name'], date,
+        """ % (count, event['name'], ven_name, date,
                event['yes_rsvp_count'], event['maybe_rsvp_count'], event['waitlist_count'],
-               event['venue']['address_1'], event['venue']['city'],
+               ven_add1, ven_city,
                event['description'], event['event_url'])
 
         count += 1
