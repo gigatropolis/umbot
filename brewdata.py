@@ -10,17 +10,20 @@ def  handle_list(command, channel):
     """
         Connects to data source to list beer related ingredient or recipe 
     """
-    response = "Try: \"list hops\""
-    words = command.split(" ")
-    print("words: %s" %(words))
 
-    if words[1] == "help":
-        return """ Use 'list to get names of beer ingredients
+    help = """ Use 'list to get names of beer ingredients
 
   Current supported ingredients are 'hops', 'grains', and 'yeast'
 
   Type a command like \"umbot list hops\" or "umbot list yeast\"
   """
+    response = ""
+    words = command.split(" ")
+    print("words: %s" %(words))
+
+    if words[1] == "help":
+        return help
+
     if words[1] == "hops":
         response =  ListHops()
 
@@ -33,12 +36,15 @@ def  handle_list(command, channel):
     if words[1] == "styles":
         if len(words) <= 2:
             response =  ListStyles()
+        else:
+            if words[2].lower() == "long":
+                response = ListStylesLong(command)
 
-        if words[2].lower() == "long":
-            response = ListStylesLong(command)
-
-    if words[1] == "recipes":
+    if words[1] == "recipes" or words[1] == "rec":
         response =  ListRecipes()
+
+    if not response:
+        response = help
 
     return response
 
@@ -46,19 +52,20 @@ def  handle_explain(command, channel):
     """
         Connects to data source to explain beer related ingredient or recipe 
     """
-    response = "Try: \"explain hop hopname\""
+    response = ""
     words = command.split(" ")
     print("words: %s" %(words))
-
-    it = words[1].lower()
-
-    if it == "help" or it == "?":
-        return """ Use 'explain to get more detail about a beer ingredient or style.
+    help = """ Use 'explain to get more detail about a beer ingredient or style.
 
   Current supported ingredient types or 'hop', 'grain', 'yeast', and 'style'
 
   Type a command like \"umbot explain hop Centennial\" or "umbot explain grain Vienna\"
   """
+    it = words[1].lower()
+
+    if it == "help" or it == "?":
+        return help
+
     if it == "hop":
         return GetHopExplanation(command.split(words[1])[1].strip())
 
@@ -71,8 +78,8 @@ def  handle_explain(command, channel):
     if it == "style":
        return GetStyleExplanation(command.split(words[1])[1].strip())
 
-    if it == "recipe":
-           return GetRecipeExplanation(command.split(words[1])[1].strip())
+    if it == "recipe" or it == "rec":
+        return GetRecipeExplanation(command.split(words[1])[1].strip())
 
 def _getIngredient(query):
      try:
