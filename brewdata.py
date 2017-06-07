@@ -81,6 +81,8 @@ def  handle_explain(command, channel):
     if it == "recipe" or it == "rec":
         return GetRecipeExplanation(command.split(words[1])[1].strip())
 
+    return help
+
 def _getIngredient(query):
      try:
         con = lite.connect(SQLITE_DATABASE)
