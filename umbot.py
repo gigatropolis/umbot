@@ -3,6 +3,7 @@ import time
 from slackclient import SlackClient
 import brewdata
 import um_meetup
+import um_untappd
 
 BOT_NAME = 'umbot'
 
@@ -63,11 +64,9 @@ def handle_list(command, channel):
     """
         Find what is being listed and call appropriate handler 
     """
-    response = "Unknown list command"
+    response = ""
     words = command.split(" ")
-
-    if (len(words) < 2) or words[1].lower() == "help":
-        return """ Use 'list to get names of beer ingredients and meetup events
+    help = """ Use 'list to get names of beer ingredients and meetup events
 
   Current beer ingredients are 'hops', 'grains', and 'yeast'
 
@@ -75,9 +74,21 @@ def handle_list(command, channel):
 
   Type a command like \"@umbot list hops\"  or "@umbot list yeast\"
   """
+
+    if (len(words) < 2) or words[1].lower() == "help":
+        return help
     if words[1].lower() == 'upcomming' or words[1].lower() == 'events':
         return um_meetup.handle_list(command, channel)
 
+    if words[1].lower() == 'beer':
+        return um_untappd.SearchBeer("umunhum brewing")
+
+    if words[1].lower() == 'brewery' or words[1].lower() == 'bry':
+        return um_untappd.ListBreweryActivity(206691)
+
+    if not response:
+        return help
+    
     return brewdata.handle_list(command, channel)
 
 def parse_slack_output(slack_rtm_output):
