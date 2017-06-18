@@ -33,17 +33,20 @@ def  handle_list(command, channel):
 def SearchBeer(search):
     
     req = _GetRequest("search/beer", q=search,limit='3')
-    beer = req.json()
+    beer = req.json()   
 
     if int(beer['meta']['code']) != 200:
-        return ""
+       return "ERROR: " % (beer['meta']['error_type'])
     else:
         return beer['response']['beers']['items']
 
 def ListBreweryActivity(breweryID):
 
-    req = _GetRequest("brewery/checkins/%s" % (breweryID),limit='20')
+    req = _GetRequest("brewery/checkins/%s" % (breweryID),limit='200')
     checkins = req.json()
+
+    if int(checkins['meta']['code']) != 200:
+        return "ERROR: %s\n" % (checkins['meta']['error_type'])
 
 #['checkin_id', 'created_at', 'checkin_comment', 'rating_score', 'user', 'beer', 'brewery', 'venue', 'comments', 'toasts', 'media', 'source', 'badges']
  
