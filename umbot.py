@@ -24,15 +24,21 @@ def GetHelp():
 Current supported commands are 'help', 'list', and 'explain'.
     
     *help*
-    *list*      events|hops|(ferm|fermentables|grains)|yeast|styles|recipes   [long]
+    *list*      events|beer|brewery|hops|(ferm|fermentables|grains)|yeast|styles|recipes   [long]
     *explain*   hop|(ferm|fermentables|grains)|yeast|style|recipe  <name of ingredient, style, or recipe to explain>
 
+
       *Example:*
-        "@umbot help"
-        "@umbot list events"   This will list the next five upcoming events on meetup
-        "@umbot list hops"
-        "@umbot list styles long"
-        "@umbot explain hop Cascade"
+        "@umbot help"   -                    Show this message
+        "@umbot list events"   -             List the next five upcoming events on meetup.com
+
+        "@umbot list beer [beer name]"   -   List beers found on untappd.com. Leave beer name blank will search "umunhum brewing"
+
+        "@umbot list brewery" or "list bry"  - List people on untappd.com drinking beer from Umunhum brewing
+
+        "@umbot list hops"   -               List of all hops in database
+        "@umbot list styles [long]"   -      List of beer styles in database
+        "@umbot explain hop Cascade"   -     This will give a detaled explanation of hop Cascade
      """
 
 
