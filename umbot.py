@@ -81,6 +81,7 @@ def handle_list(command, channel):
   Type a command like \"@umbot list hops\"  or "@umbot list yeast\"
   """
 
+    print("words: %s" %(words))
     if (len(words) < 2) or words[1].lower() == "help":
         return help
     if words[1].lower() == 'upcomming' or words[1].lower() == 'events':
@@ -93,9 +94,12 @@ def handle_list(command, channel):
         return um_untappd.ListBreweryActivity(206691)
 
     if not response:
-        return help
+        response = brewdata.handle_list(command, channel)
     
-    return brewdata.handle_list(command, channel)
+    if not response:
+        return help
+
+    return response
 
 def parse_slack_output(slack_rtm_output):
     """

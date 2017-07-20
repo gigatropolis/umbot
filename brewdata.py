@@ -10,6 +10,7 @@ def  handle_list(command, channel):
     """
         Connects to data source to list beer related ingredient or recipe 
     """
+    print("in list()")
 
     help = """ Use 'list to get names of beer ingredients
 
@@ -41,9 +42,11 @@ def  handle_list(command, channel):
                 response = ListStylesLong(command)
 
     if words[1] == "recipes" or words[1] == "rec":
+        print("In Recipe")
         response =  ListRecipes()
 
     if not response:
+        print("no response")
         response = help
 
     return response
@@ -57,9 +60,9 @@ def  handle_explain(command, channel):
     print("words: %s" %(words))
     help = """ Use 'explain to get more detail about a beer ingredient or style.
 
-  Current supported ingredient types or 'hop', 'grain', 'yeast', and 'style'
+  Current supported ingredient types or 'hop', 'grain', 'yeast', 'recipe', and 'style'
 
-  Type a command like \"umbot explain hop Centennial\" or "umbot explain grain Vienna\"
+  Type a command like \"@umbot explain hop Centennial\" or "@umbot explain grain Vienna\"
   """
     it = words[1].lower()
 
@@ -164,12 +167,13 @@ def ListRecipes():
     con = None
     query = "SELECT DISTINCT recipe.id, recipe.name, style.name, recipe.og, recipe.fg FROM recipe, style WHERE recipe.style_id = style.id"
     try:
+        print("trying..")
         con = lite.connect(SQLITE_DATABASE)
         cur = con.cursor()
         cur.execute(query)
 
         recipes = cur.fetchall()
-        #print("data: ", data)
+        print("recipes: ", recipes)
 
     except:
         recipes = None
@@ -184,7 +188,7 @@ def ListRecipes():
 
     for recipe in recipes:
         response += "(%d) %s (%s) OG: %0.3f FG: %0.3f\n" % (recipe[0], recipe[1], recipe[2], recipe[3], recipe[4])
-    
+    print("in end")
     return response
  
 def GetHopExplanation(name):
