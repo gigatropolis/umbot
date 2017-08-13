@@ -2,6 +2,7 @@ import os
 import time
 import sqlite3 as lite
 import calcbeer as beer
+import um_beerdb as beerdb
 
 SQLITE_DATABASE = r'./brewdata.sqlite'
 #SQLITE_DATABASE = r'./database.sqlite'
@@ -26,7 +27,8 @@ def  handle_list(command, channel):
         return help
 
     if words[1] == "hops":
-        response =  ListHops()
+        #response =  ListHops()
+        response =  beerdb.ListHops()
 
     if words[1] == "ferm" or words[1] == "grains" or words[1] == "fermentables":
         response =  ListFerms()
@@ -70,7 +72,8 @@ def  handle_explain(command, channel):
         return help
 
     if it == "hop":
-        return GetHopExplanation(command.split(words[1])[1].strip())
+        #return GetHopExplanation(command.split(words[1])[1].strip())
+        return beerdb.GetHopExplanation(command.split(words[1])[1].strip())
 
     if it == "grain" or it == "ferm" or it == "fermentable":
        return GetGrainExplanation(command.split(words[1])[1].strip())

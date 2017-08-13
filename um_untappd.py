@@ -12,24 +12,6 @@ def _GetRequest(name, **kwargs):
     return requests.get(url, params=data) 
 
 
-def  handle_list(command, channel):
-    """
-        Connects to data source to list beer related ingredient or recipe 
-    """
-    response = "Try: \"list hops\""
-    words = command.split(" ")
-    print("words: %s" %(words))
-
-    if words[1].lower() == 'beer':
-        events = GetEvents('umunhum', 'upcoming')
-        response = ShowEvents(events)
-
-    if response:
-        return response
-
-    return "events not found"    
-
-
 def SearchBeer(search):
     
     req = _GetRequest("search/beer", q=search,limit='3')
@@ -40,6 +22,7 @@ def SearchBeer(search):
     else:
         return beer['response']['beers']['items']
 
+    
 def ListBreweryActivity(breweryID):
 
     req = _GetRequest("brewery/checkins/%s" % (breweryID),limit='200')
