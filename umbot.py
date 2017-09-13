@@ -4,7 +4,7 @@ from slackclient import SlackClient
 import brewdata
 import um_meetup
 import um_untappd
-import um_beerdb
+import um_beerdb as beerdb
 
 BOT_NAME = 'umbot'
 
@@ -49,6 +49,8 @@ def handle_command(command, channel):
         are valid commands. If so, then acts on the commands. If not,
         returns back what it needs for clarification.
     """
+    exitRequested = False
+
     response = ""
     words = command.split(" ")
     
@@ -58,14 +60,23 @@ def handle_command(command, channel):
     elif words[0].lower() == "explain" or words[0].lower() == "ex":
         response = brewdata.handle_explain(command, channel)
         
-    if words[0].lower() == "list" or words[0].lower() == "ls":
+    elif words[0].lower() == "list" or words[0].lower() == "ls":
         response = handle_list(command, channel)
-    
+
+    elif words[0].lower() == "update":
+        response = beerdb.HandleUpdate(command, channel)
+
+    elif command.lower() == "die umbot die":
+        exitRequested = True
+        response = "@umbot dead from neglect"
+        
     if not response:
         response = GetHelp()
 
     slack_client.api_call("chat.postMessage", channel=channel,
                           text=response, as_user=True)
+
+    return exitRequested
 
 def handle_list(command, channel):
     """
@@ -131,12 +142,14 @@ if __name__ == "__main__":
 
         print("umbot connected and running!")
 
-        while True:
+        exitRequested = False
+
+        while not exitRequested:
             
             command, channel = parse_slack_output(slack_client.rtm_read())
 
             if command and channel:
-                handle_command(command, channel)
+                exitRequested = handle_command(command, channel)
 
             time.sleep(READ_WEBSOCKET_DELAY)
     else:
