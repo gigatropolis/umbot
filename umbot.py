@@ -4,7 +4,7 @@ from slackclient import SlackClient
 import brewdata
 import um_meetup
 import um_untappd
-import um_beerdb as beerdb
+import um_beerdb
 
 BOT_NAME = 'umbot'
 
@@ -64,7 +64,7 @@ def handle_command(command, channel):
         response = handle_list(command, channel)
 
     elif words[0].lower() == "update":
-        response = beerdb.HandleUpdate(command, channel)
+        response = um_beerdb.HandleUpdate(command, channel)
 
     elif command.lower() == "die umbot die":
         exitRequested = True
