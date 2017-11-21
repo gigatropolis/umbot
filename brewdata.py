@@ -314,7 +314,16 @@ def GetRecipeExplanation(name):
     if hops:
         #strHops = "| Name                       | Amount | Yield | Color |\n"
         #strHops += "|----------------------------|--------|-------|-------|---|\n"
-        strHops = "%25s %10s %10s %10s %10s %10s\n\n" % ("Name", "Amount", "time", "Alpha", "Use", "IBU") 
+ 
+        nLen = 0
+        for hop in hops:
+            actLen = len(hop[0])
+            if actLen > nLen:
+                nLen = actLen
+
+        nLen += 1
+        strHops = "%s %s %10s %10s %10s %15s %10s\n\n" % ("_" * (nLen - 4), "Name", "Amount", "time", "Alpha", "Use", "IBU") 
+
         for hop in hops:
             hopName, hopAmount, hopTime, hopAlpha, hopUse = hop
             hopAmount = beer.KilToOz(hopAmount)
@@ -331,7 +340,7 @@ def GetRecipeExplanation(name):
             else:
                 ibu = 0
             
-            strHops += "%25s %10.2foz %10d%s %10.1f%% %10s %10.1f\n" % (hopName, hopAmount, hopTime,
+            strHops += "%s %s %10.2foz %10d%s %10.1f%% %15s %10.1f\n" % ("_" * (nLen - len(hopName)), hopName, hopAmount, hopTime,
                                                     ("days" if hopUse.lower() == "dry hop" else "min"), 
                                                     hopAlpha, hopUse, ibu)
             #strHops += "| %s | %0.2foz | %dmin | %0.1f%%|\n" % (hopName, hopAmount, hopTime, hopAlpha)
