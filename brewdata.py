@@ -309,30 +309,33 @@ def GetRecipeExplanation(name):
     name, style, og, fg, batch_size, boil_size, boil_time, efficiency, notes, taste_notes = data
     batch_size = beer.KilToGal(batch_size)
     boil_size = beer.KilToGal(boil_size)
-    ibu, SRM, abv = 0, 0.0, beer.ABV(og, fg)
+    ibuTotal, SRM, abv = 0, 0.0, beer.ABV(og, fg)
 
     if hops:
         #strHops = "| Name                       | Amount | Yield | Color |\n"
         #strHops += "|----------------------------|--------|-------|-------|---|\n"
-        strHops = "%25s %10s %10s %10s %10s\n\n" % ("Name", "Amount", "time", "Alpha", "Use") 
+        strHops = "%25s %10s %10s %10s %10s %10s\n\n" % ("Name", "Amount", "time", "Alpha", "Use", "IBU") 
         for hop in hops:
             hopName, hopAmount, hopTime, hopAlpha, hopUse = hop
             hopAmount = beer.KilToOz(hopAmount)
             if hopUse.lower() == "dry hop":
                 hopTime = hopTime/60/24
 
-            strHops += "%25s %10.2foz %10d%s %10.1f%% %10s\n" % (hopName, hopAmount, hopTime,
+            bTime = hopTime
+            if hopUse.lower() == "first wort" or hopUse.lower() == "wort" or hopUse.lower() == "mash":
+                bTime = 20
+
+            if hopUse.lower() != "dry hop":
+                ibu = beer.getIBU(batch_size, bTime, hopAmount, hopAlpha, og, boil_size)
+                ibuTotal += ibu
+            else:
+                ibu = 0
+            
+            strHops += "%25s %10.2foz %10d%s %10.1f%% %10s %10.1f\n" % (hopName, hopAmount, hopTime,
                                                     ("days" if hopUse.lower() == "dry hop" else "min"), 
-                                                    hopAlpha, hopUse)
+                                                    hopAlpha, hopUse, ibu)
             #strHops += "| %s | %0.2foz | %dmin | %0.1f%%|\n" % (hopName, hopAmount, hopTime, hopAlpha)
 
-            bTime = hopTime
-            if hopUse.lower() == "dry hop":
-                continue
-            if hopUse.lower() == "first wort" or hopUse.lower() == "wort":
-                bTime = 20
-            ibu += beer.getIBU(batch_size, bTime, hopAmount, hopAlpha, og, boil_size)
-            
     else:
         strHops = ""
 
@@ -374,7 +377,7 @@ def GetRecipeExplanation(name):
     *Tasting Notes:*
     
        %s 
-""" % (name, style, og, fg, ibu, SRM, abv, batch_size, boil_size, boil_time, efficiency,
+""" % (name, style, og, fg, ibuTotal, SRM, abv, batch_size, boil_size, boil_time, efficiency,
         strHops, strFerms, notes, taste_notes)
     
     return response
