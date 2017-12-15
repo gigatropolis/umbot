@@ -66,3 +66,19 @@ def KilToLb(kilAmount):
 
 def McuToSrm(mcuAmount):
     return 1.4922 * (mcuAmount ** 0.6859)
+    
+def BrixToOg(Brix):
+	return (Brix / (258.6-((Brix / 258.2)*227.1))) + 1
+	
+def OgToBrix(Og):
+	return (((182.4601 * Og -775.6821) * Og +1262.7794) * Og -669.5622)
+	
+def RefractoFg(OrigBrix, FinalBrix):
+	"""SG = 1.001843 - 0.002318474*OB - 0.000007775*OB*OB - 0.000000034*OB*OB*OB + 0.00574*FB + 0.00003344*FB*FB + 0.000000086*FB*FB*FB 
+
+		SG = estimated specific gravity of the sample 
+		OB = Original Brix 
+		FB = Final Brix 
+	"""
+	Fg = 1.001843 - 0.002318474*OrigBrix - 0.000007775*OrigBrix**2 - 0.000000034*OrigBrix**3 + 0.00574*FinalBrix + 0.00003344*FinalBrix**2 + 0.000000086*FinalBrix**3
+	return Fg
