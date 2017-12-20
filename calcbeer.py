@@ -81,15 +81,14 @@ def _refN2(OrigBrix, FinalBrix):
     return 1.000898 + 0.003859118*OrigBrix + 0.00001370735*(OrigBrix**2) + 0.00000003742517*(OrigBrix**3)
 
 def _refN3(OrigBrix, FinalBrix):
-    return 668.72 * _refN2(OrigBrix, FinalBrix) – 463.37 – 205.347 * (_refN2(OrigBrix, FinalBrix)**2)
+    return 668.72 * _refN2(OrigBrix, FinalBrix) - 463.37 - 205.347 * (_refN2(OrigBrix, FinalBrix)**2)
 
 def RefractoFg(OrigBrix, FinalBrix):
-    """RefractoFg will convert refractometer Final gravity
-        SG = 1.001843 - 0.002318474*OB - 0.000007775*OB*OB - 0.000000034*OB*OB*OB + 0.00574*FB + 0.00003344*FB*FB + 0.000000086*FB*FB*FB 
+    """RefractoFg will convert refractometer Final gravity from original and final Brix readings from refractometer
 
-        SG = estimated specific gravity of the sample 
-        OB = Original Brix 
-        FB = Final Brix 
+        OrigBrix (RIi)  =   Original Brix reading 
+        FinalBrix (RIf) =   Final Brix Reading from refractometer 
+        FG =                Final Gravity measured
 
         FG = (1.001843 – 0.002318474*RIi – 0.000007775*RIi² – 0.000000034*RIi³ + 0.00574*RIf + 0.00003344*RIf² + 0.000000086*RIf³) + 0.0216*LN(1 –
             (0.1808*(668.72*(1.000898 + 0.003859118*RIi + 0.00001370735*RIi² + 0.00000003742517*RIi³) – 463.37 – 
@@ -99,8 +98,38 @@ def RefractoFg(OrigBrix, FinalBrix):
             (668.72*(1.000898 + 0.003859118*RIi + 0.00001370735*RIi² + 0.00000003742517*RIi³) – 463.37 – 
             205.347*(1.000898 + 0.003859118*RIi + 0.00001370735*RIi² + 0.00000003742517*RIi³)²)) + 0.0116
     """
-    #Fg = 1.001843 - 0.002318474*OrigBrix - 0.000007775*OrigBrix**2 - 0.000000034*OrigBrix**3 + 0.00574*FinalBrix + 0.00003344*FinalBrix**2 + 0.000000086*FinalBrix**3
-    FG = _refN1(OrigBrix, FinalBrix) + 0.0216 * math.log(1 – (0.1808*(668.72 * _refN2(OrigBrix, FinalBrix) – 463.37 – 205.347 * _refN2(OrigBrix, FinalBrix)**2) + 0.8192 * (668.72 * _refN1(OrigBrix, FinalBrix) – 463.37 – 205.347 * _refN1(OrigBrix, FinalBrix)**2)) / (_refN3(OrigBrix, FinalBrix))) + 0.0116
+    refN1 = _refN1(OrigBrix, FinalBrix)
+    refN2 = _refN2(OrigBrix, FinalBrix)
+    refN3 = _refN3(OrigBrix, FinalBrix)
+
+    FG = refN1 + 0.0216 * math.log(1 - (0.1808*(668.72 * refN2 - 463.37 - 205.347 * refN2**2) + 0.8192 * (668.72 * refN1 - 463.37 - 205.347 * refN1**2)) / refN3) + 0.0116
     return FG
 
 
+def HandleCalc(command, channel):
+    """
+        Handle request for beer calculations 
+    """
+    help = "Try: \"@umbot OgToBrix 1.054\""
+    response = ""
+    words = command.split(" ")
+    print("words: %s" %(words))
+
+    if words[1].lower() == 'brixtoog' and len(words) > 2:
+        og = BrixToOg(float(words[2]))
+        response = "Original Gravity is %.04f" % (og)
+
+    elif words[1].lower() == 'ogtobrix' and len(words) > 2:
+        brix = OgToBrix(float(words[2]))
+        response = "Brix is %.02f" % (brix)
+
+    elif words[1].lower() == 'refactotofg' and len(words) > 3:
+        OrigBrix = float(words[2])
+        FinalBrix = float(words[3])
+        fg = RefractoFg(OrigBrix, FinalBrix)
+        response = "Final gravity is %.04f" % (fg)
+
+    if not response:
+        response = help
+
+    return response   

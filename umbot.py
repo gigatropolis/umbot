@@ -5,6 +5,7 @@ import brewdata
 import um_meetup
 import um_untappd
 import um_beerdb
+import calcbeer
 
 BOT_NAME = 'umbot'
 
@@ -22,11 +23,13 @@ slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
 
 def GetHelp():
     return """
-Current supported commands are 'help', 'list', and 'explain'.
+Current supported commands are 'help', 'list', 'explain', 'calc', and 'source'.
     
     *help*
     *list*      events|beer|brewery|hops|(ferm|fermentables|grains)|yeast|styles|recipes   [long]
     *explain*   hop|(ferm|fermentables|grains)|yeast|style|recipe  <name of ingredient, style, or recipe to explain>
+    *calc*      OgToBrix|BrixToOg|RefactoToFg
+    *source*    Show URL to umbot Source code on GitHub
 
 
       *Example:*
@@ -56,19 +59,26 @@ def handle_command(command, channel):
     
     if words[0].lower() == "help" or words[0].lower() == "?" or words[0].lower() == "h":
         response = GetHelp()
-
+        
     elif words[0].lower() == "explain" or words[0].lower() == "ex":
         response = brewdata.handle_explain(command, channel)
         
     elif words[0].lower() == "list" or words[0].lower() == "ls":
         response = handle_list(command, channel)
-
+        
     elif words[0].lower() == "update":
         response = um_beerdb.HandleUpdate(command, channel)
-
+        
+    elif words[0].lower() == "calc":
+        response = calcbeer.HandleCalc(command, channel)
+        
     elif command.lower() == "die umbot die":
         exitRequested = True
         response = "@umbot dead from neglect"
+        
+    elif command.lower() == "source":
+        exitRequested = True
+        response = "https://github.com/gigatropolis/umbot"
         
     if not response:
         response = GetHelp()
