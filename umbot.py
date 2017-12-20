@@ -76,8 +76,7 @@ def handle_command(command, channel):
         exitRequested = True
         response = "@umbot dead from neglect"
         
-    elif command.lower() == "source":
-        exitRequested = True
+    elif words[0].lower() == "source":
         response = "https://github.com/gigatropolis/umbot"
         
     if not response:
