@@ -1,4 +1,5 @@
 
+import math
 
 def getPercentUtilization(boilTime):
     """ Calculate the correct percent Utilization 
@@ -73,12 +74,33 @@ def BrixToOg(Brix):
 def OgToBrix(Og):
 	return (((182.4601 * Og -775.6821) * Og +1262.7794) * Og -669.5622)
 	
-def RefractoFg(OrigBrix, FinalBrix):
-	"""SG = 1.001843 - 0.002318474*OB - 0.000007775*OB*OB - 0.000000034*OB*OB*OB + 0.00574*FB + 0.00003344*FB*FB + 0.000000086*FB*FB*FB 
+def _refN1(OrigBrix, FinalBrix):
+    return 1.001843 - 0.002318474*OrigBrix - 0.000007775*(OrigBrix**2) - 0.000000034*(OrigBrix**3) + 0.00574*FinalBrix + 0.00003344*(FinalBrix**2) + 0.000000086*(FinalBrix**3)
 
-		SG = estimated specific gravity of the sample 
-		OB = Original Brix 
-		FB = Final Brix 
-	"""
-	Fg = 1.001843 - 0.002318474*OrigBrix - 0.000007775*OrigBrix**2 - 0.000000034*OrigBrix**3 + 0.00574*FinalBrix + 0.00003344*FinalBrix**2 + 0.000000086*FinalBrix**3
-	return Fg
+def _refN2(OrigBrix, FinalBrix):
+    return 1.000898 + 0.003859118*OrigBrix + 0.00001370735*(OrigBrix**2) + 0.00000003742517*(OrigBrix**3)
+
+def _refN3(OrigBrix, FinalBrix):
+    return 668.72 * _refN2(OrigBrix, FinalBrix) – 463.37 – 205.347 * (_refN2(OrigBrix, FinalBrix)**2)
+
+def RefractoFg(OrigBrix, FinalBrix):
+    """RefractoFg will convert refractometer Final gravity
+        SG = 1.001843 - 0.002318474*OB - 0.000007775*OB*OB - 0.000000034*OB*OB*OB + 0.00574*FB + 0.00003344*FB*FB + 0.000000086*FB*FB*FB 
+
+        SG = estimated specific gravity of the sample 
+        OB = Original Brix 
+        FB = Final Brix 
+
+        FG = (1.001843 – 0.002318474*RIi – 0.000007775*RIi² – 0.000000034*RIi³ + 0.00574*RIf + 0.00003344*RIf² + 0.000000086*RIf³) + 0.0216*LN(1 –
+            (0.1808*(668.72*(1.000898 + 0.003859118*RIi + 0.00001370735*RIi² + 0.00000003742517*RIi³) – 463.37 – 
+            205.347*(1.000898 + 0.003859118*RIi + 0.00001370735*RIi² + 0.00000003742517*RIi³)²) + 
+            0.8192*(668.72*(1.001843 – 0.002318474*RIi – 0.000007775*RIi² – 0.000000034*RIi³ + 0.00574*RIf + 0.00003344*RIf² + 0.000000086*RIf³) – 463.37 – 
+            205.347*(1.001843 – 0.002318474*RIi – 0.000007775*RIi² – 0.000000034*RIi³ + 0.00574*RIf + 0.00003344*RIf² + 0.000000086*RIf³)²)) / 
+            (668.72*(1.000898 + 0.003859118*RIi + 0.00001370735*RIi² + 0.00000003742517*RIi³) – 463.37 – 
+            205.347*(1.000898 + 0.003859118*RIi + 0.00001370735*RIi² + 0.00000003742517*RIi³)²)) + 0.0116
+    """
+    #Fg = 1.001843 - 0.002318474*OrigBrix - 0.000007775*OrigBrix**2 - 0.000000034*OrigBrix**3 + 0.00574*FinalBrix + 0.00003344*FinalBrix**2 + 0.000000086*FinalBrix**3
+    FG = _refN1(OrigBrix, FinalBrix) + 0.0216 * math.log(1 – (0.1808*(668.72 * _refN2(OrigBrix, FinalBrix) – 463.37 – 205.347 * _refN2(OrigBrix, FinalBrix)**2) + 0.8192 * (668.72 * _refN1(OrigBrix, FinalBrix) – 463.37 – 205.347 * _refN1(OrigBrix, FinalBrix)**2)) / (_refN3(OrigBrix, FinalBrix))) + 0.0116
+    return FG
+
+
