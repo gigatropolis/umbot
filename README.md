@@ -24,12 +24,3 @@ Current supported commands:
         "@umbot list styles [long]"   -      List of beer styles in database
         "@umbot explain hop Cascade"   -     This will give a detaled explanation of hop Cascade
 
-
-| Name | Amount | time | Alpha | Use | IBU |
-| -------------------- | ---------- | ---------- | ---------- | --------------- | ---------- |
-Fuggles | 0.50oz | 7 days | 5.1% | Dry Hop | 0.0
-Goldings, East Kent | 0.50oz | 7 days | 6.2% | Dry Hop | 0.0
-Goldings, East Kent | 0.75oz | 15 min | 5.3% | Boil | 9.5
-Fuggles | 0.50oz | 5 min | 5.1% | Boil | 3.8
-Fuggles | 0.50oz | 1 min | 5.1% | Boil | 3.8
-Goldings, East Kent | 0.50oz | 1 min | 5.3% | Boil | 3.9
