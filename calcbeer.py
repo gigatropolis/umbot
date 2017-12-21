@@ -117,17 +117,17 @@ def HandleCalc(command, channel):
 
     if words[1].lower() == 'brixtoog' and len(words) > 2:
         og = BrixToOg(float(words[2]))
-        response = "Original Gravity is %.04f" % (og)
+        response = "Original Gravity is %.4f" % (og)
 
     elif words[1].lower() == 'ogtobrix' and len(words) > 2:
         brix = OgToBrix(float(words[2]))
-        response = "Brix is %.02f" % (brix)
+        response = "Brix is %.2f" % (brix)
 
     elif words[1].lower() == 'refactotofg' and len(words) > 3:
         OrigBrix = float(words[2])
         FinalBrix = float(words[3])
         fg = RefractoFg(OrigBrix, FinalBrix)
-        response = "Final gravity is %.04f" % (fg)
+        response = "Final gravity is %.4f" % (fg)
 
     if not response:
         response = help
