@@ -39,17 +39,17 @@ def getGravityAdjustment(boilGravity):
     ga = (boilGravity-1.050) / 0.2
     return ga
 
-def getIBU(waterQuantity, boilTime, amount, bitterness, OriginalGrav, boilQuantity):
+def getIBU(waterQuantity, boilTime, amount, percAlpha, OriginalGrav, boilQuantity):
     Utilization = getPercentUtilization(boilTime)  / 100.0
     boilGravity = getBoilGravity(waterQuantity, boilQuantity, OriginalGrav)
     gravAdjustment = getGravityAdjustment(boilGravity)
-    ibu = (amount * Utilization * (bitterness / 100) * 7462.0) / (waterQuantity * (1 + gravAdjustment))
+    ibu = (amount * Utilization * (percAlpha / 100) * 7462.0) / (waterQuantity * (1 + gravAdjustment))
     return ibu
 
-def defHopsForDesiredIBU(desiredIBU, waterQuantity, boilTime, bitterness, boilGravity):
+def defHopsForDesiredIBU(desiredIBU, waterQuantity, boilTime, percAlpha, boilGravity):
     Utilization = getPercentUtilization(boilTime) / 100.0
     gravAdjustment = getGravityAdjustment(boilGravity)
-    desiredIBU = (waterQuantity * (1+gravAdjustment) * desiredIBU) / (Utilization * (bitterness/100.0)*7462.0)
+    desiredIBU = (waterQuantity * (1+gravAdjustment) * desiredIBU) / (Utilization * (percAlpha / 100.0)*7462.0)
     return desiredIBU
 
 def ABV(og, fg):
