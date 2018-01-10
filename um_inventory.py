@@ -115,12 +115,14 @@ def AddSalesInventory(command):
     if words[6].lower() != "to":
         return "Wrong format\n\n%s" % (help)
 
+    print("len(words) = ", len(words))
+
     if len(words) > 8 and words[8] == "from":
         record = (_GetSalesId(words[9]), words[5], words[3], words[7], int(words[2]))
         query = "INSERT INTO Beer (Sales_ID, Name, Type, Location, Amount) VALUES (?,?,?,?,?)"
     else:
         record = (words[5], words[3], words[7], int(words[2]))
-        query = "INSERT INTO Beer (Sales_ID, Name, Type, Location, Amount) VALUES (?,?,?,?)"
+        query = "INSERT INTO Beer (Name, Type, Location, Amount) VALUES (?,?,?,?)"
        
     try:
         con = lite.connect(SQLITE_DATABASE)
