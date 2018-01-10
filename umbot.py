@@ -5,6 +5,7 @@ import brewdata
 import um_meetup
 import um_untappd
 import um_beerdb
+import um_inventory
 
 BOT_NAME = 'umbot'
 
@@ -20,29 +21,6 @@ AT_BOT = "<@" + BOT_ID + ">"
 # instantiate Slack & Twilio clients
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
 
-def GetHelp():
-    return """
-Current supported commands are 'help', 'list', and 'explain'.
-    
-    *help*
-    *list*      events|beer|brewery|hops|(ferm|fermentables|grains)|yeast|styles|recipes   [long]
-    *explain*   hop|(ferm|fermentables|grains)|yeast|style|recipe  <name of ingredient, style, or recipe to explain>
-
-
-      *Example:*
-        "@umbot help"   -                    Show this message
-        "@umbot list events"   -             List the next five upcoming events on meetup.com
-
-        "@umbot list beer [beer name]"   -   List beers found on untappd.com. Leave beer name blank will search "umunhum brewing"
-
-        "@umbot list brewery" or "list bry"  - List people on untappd.com drinking beer from Umunhum brewing
-
-        "@umbot list hops"   -               List of all hops in database
-        "@umbot list styles [long]"   -      List of beer styles in database
-        "@umbot explain hop Cascade"   -     This will give a detaled explanation of hop Cascade
-     """
-
-
 def handle_command(command, channel):
     """
         Receives commands directed at the bot and determines if they
@@ -53,18 +31,22 @@ def handle_command(command, channel):
 
     response = ""
     words = command.split(" ")
-    
-    if words[0].lower() == "help" or words[0].lower() == "?" or words[0].lower() == "h":
+    cmd = words[0].lower()
+
+    if cmd == "help" or cmd == "?" or cmd == "h":
         response = GetHelp()
 
-    elif words[0].lower() == "explain" or words[0].lower() == "ex":
+    elif cmd == "explain" or cmd == "ex":
         response = brewdata.handle_explain(command, channel)
         
-    elif words[0].lower() == "list" or words[0].lower() == "ls":
+    elif cmd == "list" or cmd == "ls":
         response = handle_list(command, channel)
 
-    elif words[0].lower() == "update":
+    elif cmd == "update":
         response = um_beerdb.HandleUpdate(command, channel)
+
+    elif cmd == "inventory" or cmd == "inv":
+        response = um_inventory.HandleInventory(command, channel)
 
     elif command.lower() == "die umbot die":
         exitRequested = True
@@ -94,15 +76,17 @@ def handle_list(command, channel):
   """
 
     print("words: %s" %(words))
+    req = words[1].lower()
+
     if (len(words) < 2) or words[1].lower() == "help":
         return help
-    if words[1].lower() == 'upcomming' or words[1].lower() == 'events':
+    if req == 'upcomming' or req == 'events':
         return um_meetup.handle_list(command, channel)
 
-    if words[1].lower() == 'beer':
+    if req == 'beer':
         return um_untappd.SearchBeer("umunhum brewing")
 
-    if words[1].lower() == 'brewery' or words[1].lower() == 'bry':
+    if req == 'brewery' or req == 'bry':
         return um_untappd.ListBreweryActivity(206691)
 
     if not response:
@@ -132,6 +116,32 @@ def parse_slack_output(slack_rtm_output):
                        output['channel']
     return None, None
 
+def GetHelp():
+    
+    try:
+        with open('README.md', 'r') as hFile:
+            return hFile.read()
+    except:
+        return """
+Current supported commands are 'help', 'list', and 'explain'.
+    
+    *help*
+    *list*      events|beer|brewery|hops|(ferm|fermentables|grains)|yeast|styles|recipes   [long]
+    *explain*   hop|(ferm|fermentables|grains)|yeast|style|recipe  <name of ingredient, style, or recipe to explain>
+
+
+      *Example:*
+        "@umbot help"   -                    Show this message
+        "@umbot list events"   -             List the next five upcoming events on meetup.com
+
+        "@umbot list beer [beer name]"   -   List beers found on untappd.com. Leave beer name blank will search "umunhum brewing"
+
+        "@umbot list brewery" or "list bry"  - List people on untappd.com drinking beer from Umunhum brewing
+
+        "@umbot list hops"   -               List of all hops in database
+        "@umbot list styles [long]"   -      List of beer styles in database
+        "@umbot explain hop Cascade"   -     This will give a detaled explanation of hop Cascade
+     """
     
 if __name__ == "__main__":
     READ_WEBSOCKET_DELAY = 1 # 1 second delay between reading from firehose
