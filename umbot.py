@@ -6,6 +6,7 @@ import um_meetup
 import um_untappd
 import um_beerdb
 import um_inventory
+import calcbeer
 
 BOT_NAME = 'umbot'
 
@@ -20,6 +21,31 @@ AT_BOT = "<@" + BOT_ID + ">"
 
 # instantiate Slack & Twilio clients
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
+
+def GetHelp():
+    return """
+Current supported commands are 'help', 'list', 'explain', 'calc', and 'source'.
+    
+    *help*
+    *list*      events|beer|brewery|hops|(ferm|fermentables|grains)|yeast|styles|recipes   [long]
+    *explain*   hop|(ferm|fermentables|grains)|yeast|style|recipe  <name of ingredient, style, or recipe to explain>
+    *calc*      OgToBrix|BrixToOg|RefactoToFg
+    *source*    Show URL to umbot Source code on GitHub
+
+
+      *Example:*
+        "@umbot help"   -                    Show this message
+        "@umbot list events"   -             List the next five upcoming events on meetup.com
+
+        "@umbot list beer [beer name]"   -   List beers found on untappd.com. Leave beer name blank will search "umunhum brewing"
+
+        "@umbot list brewery" or "list bry"  - List people on untappd.com drinking beer from Umunhum brewing
+
+        "@umbot list hops"   -               List of all hops in database
+        "@umbot list styles [long]"   -      List of beer styles in database
+        "@umbot explain hop Cascade"   -     This will give a detaled explanation of hop Cascade
+     """
+
 
 def handle_command(command, channel):
     """
@@ -48,9 +74,15 @@ def handle_command(command, channel):
     elif cmd == "inventory" or cmd == "inv":
         response = um_inventory.HandleInventory(command, channel)
 
+    elif cmd == "calc":
+        response = calcbeer.HandleCalc(command, channel)
+        
     elif command.lower() == "die umbot die":
         exitRequested = True
         response = "@umbot dead from neglect"
+        
+    elif words[0].lower() == "source":
+        response = "https://github.com/gigatropolis/umbot"
         
     if not response:
         response = GetHelp()

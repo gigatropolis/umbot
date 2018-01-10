@@ -5,6 +5,9 @@
     *list*      events|beer|brewery|hops|(ferm|fermentables|grains)|yeast|styles|recipes   [long]
     *explain*   hop|(ferm|fermentables|grains)|yeast|style|recipe  <name of ingredient, style, or recipe to explain>
     *inventory* add|delete|list|expot|import
+    *calc*      OgToBrix|BrixToOg|RefactoToFg
+    *source*    Show URL to umbot Source code on GitHub
+
 
       *Example:*
         "@umbot help"   -                    Show this message

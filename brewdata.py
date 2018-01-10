@@ -322,7 +322,8 @@ def GetRecipeExplanation(name):
                 nLen = actLen
 
         nLen += 1
-        strHops = "%s %s %10s %10s %10s %15s %10s\n\n" % ("_" * (nLen - 4), "Name", "Amount", "time", "Alpha", "Use", "IBU") 
+        strHops = "\n\n| %s | %s | %s | %s | %s | %s |\n" % ( "Name", "Amount", "time", "Alpha", "Use", "IBU") 
+        strHops += "| %s | %s | %s | %s | %s | %s |\n" % ("-" * nLen, "-" * 10, "-" * 10, "-" * 10, "-" * 15, "-" * 10)
 
         for hop in hops:
             hopName, hopAmount, hopTime, hopAlpha, hopUse = hop
@@ -340,7 +341,7 @@ def GetRecipeExplanation(name):
             else:
                 ibu = 0
             
-            strHops += "%s %s %10.2foz %10d%s %10.1f%% %15s %10.1f\n" % ("_" * (nLen - len(hopName)), hopName, hopAmount, hopTime,
+            strHops += "%s | %.2foz | %d %s | %.1f%% | %s | %.1f\n" % (hopName, hopAmount, hopTime,
                                                     ("days" if hopUse.lower() == "dry hop" else "min"), 
                                                     hopAlpha, hopUse, ibu)
             #strHops += "| %s | %0.2foz | %dmin | %0.1f%%|\n" % (hopName, hopAmount, hopTime, hopAlpha)
