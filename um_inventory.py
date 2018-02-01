@@ -31,7 +31,7 @@ Inventory commands: help, list, delete, add, export, import
 
     Example:
 
-        @umbot inv add 3 Sixtle of SAS to Taplands
+        @umbot inv add 3 Sixtle of SAS to Taplands from David
 
 *delete* - delete an existing sales record
 
@@ -143,7 +143,11 @@ def AddSalesInventory(command):
         HS     Hismen Sii
         IPO    IPO IPA
      
-     """
+         Example:
+
+        @umbot inv add 3 Sixtle of SAS to Taplands from David
+
+"""
     if len(words) < 8:
         return "Not enough words\n\n%s" % (help)
 
