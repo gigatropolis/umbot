@@ -13,7 +13,33 @@ def  HandleInventory(command, channel):
     response = ""
     words = command.split(" ")
     print("words: %s" %(words))
-    help = """List inventory"""
+    help = """
+Inventory commands: help, list, delete, add, export, import
+
+*list* - list sales
+
+*add* - Addes a new sales transaction to inventory list:
+
+    Message sent in format:  @umbot inventory add <amount> <Type> of <name> to <location> [from <name>]
+
+    Type is 'sixtel', 'case', or 'half'
+
+    Beer Name is one of:
+    SAS    Stout as a service
+    HS     Hismen Sii
+    IPO    IPO IPA
+
+    Example:
+
+        @umbot inv add 3 Sixtle of SAS to Taplands
+
+*delete* - delete an existing sales record
+
+*export* - Export data to specified format
+
+    EXCEL   Windows excel spreadsheet
+    COMMA   Comma seperated list
+     """
     cmd = words[1].lower()
 
     if cmd == "help" or cmd == "?":
@@ -33,21 +59,26 @@ def  HandleInventory(command, channel):
            return ListUserSales()
 
     if cmd == "export":
-       return GetStyleExplanation(command.split(words[1])[1].strip())
+       return ExportSalesInventory(command.split(words[1])[1].strip())
 
     if cmd == "import":
         return GetRecipeExplanation(command.split(words[1])[1].strip())
 
     return help
 
-def _GetQuery(query):
+def _GetQuery(query, *records):
+    print("Query: ", query)
+    print("*records", records)
     try:
         con = lite.connect(SQLITE_DATABASE)
         cur = con.cursor()
-        cur.execute(query)
+        if records:
+            cur.execute(query, records)
+        else:
+            cur.execute(query)
 
         data = cur.fetchall()
-        #print("data: ", data)
+        print("_GetQuery::data: ", data)
     except:
         data = None
     finally:
@@ -57,10 +88,14 @@ def _GetQuery(query):
     return data
 
 def _GetSalesId(name):
-    data = _GetQuery("SELECT ID FROM Beer WHERE Name = ?", name) 
+    data = _GetQuery("SELECT ID FROM SalesPerson WHERE Name = ?", name) 
     if not data:
+        print("_GetSalesId::No data")
         return 0
-    return int(data[0])
+
+    salesId = int(data[0][0])
+    #print("Sales id = ", salesId)    
+    return salesId
 
 def ListInventory(name = '', type = '', amount = ''):
     
