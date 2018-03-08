@@ -168,7 +168,7 @@ def ListStyles():
 def ListRecipes():
     response = "Unable to get Recipe list from database"
     con = None
-    query = "SELECT DISTINCT recipe.id, recipe.name, style.name, recipe.og, recipe.fg FROM recipe, style WHERE recipe.style_id = style.id"
+    query = "SELECT DISTINCT recipe.id, recipe.name, style.name, recipe.og, recipe.fg FROM recipe, style WHERE recipe.style_id = style.id and recipe.deleted = 0"
     try:
         print("trying..")
         con = lite.connect(SQLITE_DATABASE)
