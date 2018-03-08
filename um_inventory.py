@@ -4,7 +4,7 @@ import sqlite3 as lite
 import calcbeer as beer
 import um_beerdb as beerdb
 
-SQLITE_DATABASE = r'.\data\inventory\inventory.sqlite'
+SQLITE_DATABASE = r'./data/inventory/inventory.sqlite'
 
 def  HandleInventory(command, channel):
     """
@@ -178,4 +178,4 @@ def AddSalesInventory(command):
 
     return "added sales record to database"
     
-    
+ 
