@@ -127,7 +127,8 @@ def HandleCalc(command, channel):
         OrigBrix = float(words[2])
         FinalBrix = float(words[3])
         fg = RefractoFg(OrigBrix, FinalBrix)
-        response = "Final gravity is %.4f" % (fg)
+        abv = ABV(BrixToOg(OrigBrix), fg)
+        response = "Final gravity is %.4f with ABV of %.2f%%" % (fg, abv)
 
     if not response:
         response = help
