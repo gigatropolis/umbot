@@ -74,6 +74,36 @@ def BrixToOg(Brix):
 def OgToBrix(Og):
 	return (((182.4601 * Og -775.6821) * Og +1262.7794) * Og -669.5622)
 	
+def RefractoFg2(OrigBrix, FinalBrix):
+    """RefractoFg will convert refractometer Final gravity from original and final Brix readings from refractometer
+
+        FG = 1.0111958 – 0.00813003RIi + 0.0144032RIf + 0.000523555RIi² – 0.00166862RIf² – 0.0000125754RIi³ + 0.0000812663RIf³
+        FG = 1.00358522 – 0.00123861*RIi + 0.00380186*RIf
+
+        OrigBrix (RIi)  =   Original Brix reading 
+        FinalBrix (RIf) =   Final Brix Reading from refractometer 
+        FG =                Final Gravity measured
+    """
+    FG = 1.00358522 - 0.00123861*OrigBrix + 0.00380186*FinalBrix
+
+    return FG
+
+
+def RefractoFg4(OrigBrix, FinalBrix):
+    """RefractoFg will convert refractometer Final gravity from original and final Brix readings from refractometer
+
+        FG = 1.0111958 – 0.00813003RIi + 0.0144032RIf + 0.000523555RIi² – 0.00166862RIf² – 0.0000125754RIi³ + 0.0000812663RIf³
+        FG = 1.00358522 – 0.00123861*RIi + 0.00380186*RIf
+SG = 1.001843 - 0.002318474(OB) - 0.000007775(OB^2) - 0.000000034(OB^3) + 0.00574(AB) + 0.00003344(AB^2) + 0.000000086(AB^3)
+        OrigBrix (RIi)  =   Original Brix reading 
+        FinalBrix (RIf) =   Final Brix Reading from refractometer 
+        FG =                Final Gravity measured
+    """
+    FG = 1.001843 - 0.002318474 * (OrigBrix) - 0.000007775 * (OrigBrix**2) - 0.000000034 * (OrigBrix**3) + \
+         0.00574 * (FinalBrix) + 0.00003344 * (FinalBrix**2) + 0.000000086 * (FinalBrix**3)
+
+    return FG
+
 def _refN1(OrigBrix, FinalBrix):
     return 1.001843 - 0.002318474*OrigBrix - 0.000007775*(OrigBrix**2) - 0.000000034*(OrigBrix**3) + 0.00574*FinalBrix + 0.00003344*(FinalBrix**2) + 0.000000086*(FinalBrix**3)
 
@@ -85,6 +115,9 @@ def _refN3(OrigBrix, FinalBrix):
 
 def RefractoFg(OrigBrix, FinalBrix):
     """RefractoFg will convert refractometer Final gravity from original and final Brix readings from refractometer
+
+FG = 1.0111958 – 0.00813003RIi + 0.0144032RIf + 0.000523555RIi² – 0.00166862RIf² – 0.0000125754RIi³ + 0.0000812663RIf³
+FG = 1.00358522 – 0.00123861*RIi + 0.00380186*RIf
 
         OrigBrix (RIi)  =   Original Brix reading 
         FinalBrix (RIf) =   Final Brix Reading from refractometer 
@@ -126,7 +159,10 @@ def HandleCalc(command, channel):
     elif words[1].lower() == 'refactotofg' and len(words) > 3:
         OrigBrix = float(words[2])
         FinalBrix = float(words[3])
-        fg = RefractoFg(OrigBrix, FinalBrix)
+        #fg = RefractoFg(OrigBrix, FinalBrix)
+        #fg = RefractoFg2(OrigBrix, FinalBrix)
+        #fg = RefractoFg3(OrigBrix, FinalBrix)
+        fg = RefractoFg4(OrigBrix, FinalBrix)
         abv = ABV(BrixToOg(OrigBrix), fg)
         response = "Final gravity is %.4f with ABV of %.2f%%" % (fg, abv)
 
