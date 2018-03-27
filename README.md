@@ -62,7 +62,7 @@
     *Example:*
       "@umbot calc ogtobrix 1.089"   (returns "Brix is 21.35")
       "@umbot calc BrixToOg 21.35"   (Returns "Original Gravity is 1.0890")
-      "@umbot calc RefactoToFg 19.3 11.3"  (Returns "Final gravity is 1.0228")
+      "@umbot calc RefractoToFg 19.3 11.3"  (Returns "Final gravity is 1.0228")
 
 ---    
   *source*    Show URL to umbot Source code on GitHub

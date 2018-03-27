@@ -70,14 +70,21 @@ def McuToSrm(mcuAmount):
     
 def BrixToOg(Brix):
 	return (Brix / (258.6-((Brix / 258.2)*227.1))) + 1
-	
+
 def OgToBrix(Og):
-	return (((182.4601 * Og -775.6821) * Og +1262.7794) * Og -669.5622)
+    
+    brix = (((182.4601 * Og -775.6821) * Og +1262.7794) * Og -669.5622)
+    return brix
+	
+def OgToBrix2(Og):
+    """ -676.67 + 1286.4*SG - 800.47*(SG^2) + 190.74*(SG^3) """
+
+    brix = -676.67 + 1286.4*Og - 800.47*(Og**2) + 190.74*(Og**3)
+    return brix
 	
 def RefractoFg2(OrigBrix, FinalBrix):
     """RefractoFg will convert refractometer Final gravity from original and final Brix readings from refractometer
 
-        FG = 1.0111958 – 0.00813003RIi + 0.0144032RIf + 0.000523555RIi² – 0.00166862RIf² – 0.0000125754RIi³ + 0.0000812663RIf³
         FG = 1.00358522 – 0.00123861*RIi + 0.00380186*RIf
 
         OrigBrix (RIi)  =   Original Brix reading 
@@ -88,13 +95,25 @@ def RefractoFg2(OrigBrix, FinalBrix):
 
     return FG
 
+def RefractoFg3(OrigBrix, FinalBrix):
+    """RefractoFg will convert refractometer Final gravity from original and final Brix readings from refractometer
+
+        FG = 1.0111958 – 0.00813003RIi + 0.0144032RIf + 0.000523555RIi² – 0.00166862RIf² – 0.0000125754RIi³ + 0.0000812663RIf³
+ 
+        OrigBrix (RIi)  =   Original Brix reading 
+        FinalBrix (RIf) =   Final Brix Reading from refractometer 
+        FG =                Final Gravity measured
+    """
+    FG = 1.0111958 - 0.00813003 * OrigBrix + 0.0144032 * FinalBrix + 0.000523555 * OrigBrix**2 - 0.00166862 * FinalBrix**2 - \
+         0.0000125754 * OrigBrix**3 + 0.0000812663 * FinalBrix**3
+
+    return FG
 
 def RefractoFg4(OrigBrix, FinalBrix):
     """RefractoFg will convert refractometer Final gravity from original and final Brix readings from refractometer
 
-        FG = 1.0111958 – 0.00813003RIi + 0.0144032RIf + 0.000523555RIi² – 0.00166862RIf² – 0.0000125754RIi³ + 0.0000812663RIf³
-        FG = 1.00358522 – 0.00123861*RIi + 0.00380186*RIf
-SG = 1.001843 - 0.002318474(OB) - 0.000007775(OB^2) - 0.000000034(OB^3) + 0.00574(AB) + 0.00003344(AB^2) + 0.000000086(AB^3)
+        SG = 1.001843 - 0.002318474(OB) - 0.000007775(OB^2) - 0.000000034(OB^3) + 0.00574(AB) + 0.00003344(AB^2) + 0.000000086(AB^3)
+
         OrigBrix (RIi)  =   Original Brix reading 
         FinalBrix (RIf) =   Final Brix Reading from refractometer 
         FG =                Final Gravity measured
@@ -115,9 +134,6 @@ def _refN3(OrigBrix, FinalBrix):
 
 def RefractoFg(OrigBrix, FinalBrix):
     """RefractoFg will convert refractometer Final gravity from original and final Brix readings from refractometer
-
-FG = 1.0111958 – 0.00813003RIi + 0.0144032RIf + 0.000523555RIi² – 0.00166862RIf² – 0.0000125754RIi³ + 0.0000812663RIf³
-FG = 1.00358522 – 0.00123861*RIi + 0.00380186*RIf
 
         OrigBrix (RIi)  =   Original Brix reading 
         FinalBrix (RIf) =   Final Brix Reading from refractometer 
@@ -150,19 +166,33 @@ def HandleCalc(command, channel):
 
     if words[1].lower() == 'brixtoog' and len(words) > 2:
         og = BrixToOg(float(words[2]))
-        response = "Original Gravity is %.4f" % (og)
+        response = "Original gravity is %.4f" % (og)
 
     elif words[1].lower() == 'ogtobrix' and len(words) > 2:
-        brix = OgToBrix(float(words[2]))
-        response = "Brix is %.2f" % (brix)
+        og = float(words[2])
+        brix = OgToBrix(og)
+        brix2 = OgToBrix2(og)
+        response = "Brix is %.2f  Brix2 if %.2f" % (brix, brix2)
 
-    elif words[1].lower() == 'refactotofg' and len(words) > 3:
+    elif words[1].lower().find('refractotofg') == 0 and len(words) > 3:
+        
         OrigBrix = float(words[2])
         FinalBrix = float(words[3])
-        #fg = RefractoFg(OrigBrix, FinalBrix)
-        #fg = RefractoFg2(OrigBrix, FinalBrix)
-        #fg = RefractoFg3(OrigBrix, FinalBrix)
-        fg = RefractoFg4(OrigBrix, FinalBrix)
+        refracto = words[1].lower()
+
+        if len(refracto) == 13:
+            type = refracto[12]
+            if type == '2':
+                fg = RefractoFg2(OrigBrix, FinalBrix)
+            elif type == '3':
+                fg = RefractoFg3(OrigBrix, FinalBrix)
+            elif type == '4':
+                fg = RefractoFg4(OrigBrix, FinalBrix)
+            else:
+                fg = RefractoFg(OrigBrix, FinalBrix)
+        else:
+            fg = RefractoFg(OrigBrix, FinalBrix)
+
         abv = ABV(BrixToOg(OrigBrix), fg)
         response = "Final gravity is %.4f with ABV of %.2f%%" % (fg, abv)
 
