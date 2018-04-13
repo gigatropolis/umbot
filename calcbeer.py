@@ -135,6 +135,8 @@ def _refN3(OrigBrix, FinalBrix):
 def RefractoFg(OrigBrix, FinalBrix):
     """RefractoFg will convert refractometer Final gravity from original and final Brix readings from refractometer
 
+    http://seanterrill.com/2010/07/20/toward-a-better-refractometer-correlation/
+    
         OrigBrix (RIi)  =   Original Brix reading 
         FinalBrix (RIf) =   Final Brix Reading from refractometer 
         FG =                Final Gravity measured
