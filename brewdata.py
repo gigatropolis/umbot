@@ -286,13 +286,26 @@ def GetStyleExplanation(name):
 
 def GetRecipeExplanation(name):
     
-    query = "SELECT id from recipe WHERE name like '%%%s%%'" % (name)
-    recID = _getIngredient(query)
+    recID = 0
+    
+    try:
+        query = "SELECT name from recipe WHERE id = %d" % (int(name))
+        m = _getIngredient(query)
+
+        if m:
+            recID = int(name)
+
+    except:
+        recID = 0
 
     if not recID:
-        return "Can't find recipe name '%s'" % (name)
+        query = "SELECT id from recipe WHERE name like '%%%s%%'" % (name)
+        id = _getIngredient(query)
+
+        if not id:
+            return "Can't find recipe name '%s'" % (name)
     
-    recID = recID[0]
+        recID = id[0]
    
     query = "SELECT hop.name, hop.amount, hop.time, hop.alpha, hop.use FROM hop, hop_in_recipe WHERE hop_in_recipe.recipe_id=%d AND hop.id = hop_in_recipe.hop_id" % (recID)
     hops = _GetAllRecords(query)
