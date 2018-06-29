@@ -188,10 +188,13 @@ if __name__ == "__main__":
 
         while not exitRequested:
             
-            command, channel = parse_slack_output(slack_client.rtm_read())
+            try:
+                command, channel = parse_slack_output(slack_client.rtm_read())
 
-            if command and channel:
-                exitRequested = handle_command(command, channel)
+                if command and channel:
+                    exitRequested = handle_command(command, channel)
+            except:
+                pass
 
             time.sleep(READ_WEBSOCKET_DELAY)
     else:
