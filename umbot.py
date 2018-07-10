@@ -194,8 +194,13 @@ if __name__ == "__main__":
                 if command and channel:
                     exitRequested = handle_command(command, channel)
             except:
-                pass
-
+                print("Failed in main loop. Trying to reconnect...")
+                time.sleep(20)
+                if not slack_client.rtm_connect():
+                    print("Connection failed. going down")
+                    raise
+                print("Continue on...")                   
+ 
             time.sleep(READ_WEBSOCKET_DELAY)
     else:
         print("Connection failed. Invalid Slack token or bot ID?")
