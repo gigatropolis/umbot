@@ -176,6 +176,12 @@ def HandleCalc(command, channel):
         brix2 = OgToBrix2(og)
         response = "Brix is %.2f  Brix2 if %.2f" % (brix, brix2)
 
+    elif words[1].lower() == 'abv' and len(words) > 3:
+        og = float(words[2])
+        fg = float(words[3])
+        abv = ABV(og, fg)
+        response = "ABV is %.2f  " % (abv)
+        
     elif words[1].lower().find('refractotofg') == 0 and len(words) > 3:
         
         OrigBrix = float(words[2])
